@@ -21,9 +21,21 @@ var searcher = {
       }
       $.getJSON(url + params,
         (data) => {
+          $("#bienesraices").html("")
           console.log(data)
+          $.map(data, (o, i) => {
+            var tpl = $("#template").html()
+            tpl = tpl.replace("{Direccion}", o.Direccion)
+            tpl = tpl.replace("{Ciudad}", o.Ciudad)
+            tpl = tpl.replace("{Telefono}", o.Telefono)
+            tpl = tpl.replace("{Codigo_Postal}", o.Codigo_Postal)
+            tpl = tpl.replace("{Tipo}", o.Tipo)
+            tpl = tpl.replace("{Precio}", o.Precio)
+            $("#bienesraices").append(tpl)
+          })
         },
         (jqXHR, textStatus, errorThrown) => {
+            $("#bienesraices").html("")
             console.log('error ' + textStatus + " " + errorThrown);
         }
       )
