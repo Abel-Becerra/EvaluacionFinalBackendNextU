@@ -2,7 +2,8 @@ let express = require('express'),
     router = express.Router(),
     {promisify} = require('util'),
     fs = require('fs'),
-    readFileAsync = promisify(fs.readFile)
+    readFileAsync = promisify(fs.readFile),
+    Enumerable = require("linq-es2015")
 
 router.get('/', (req, res, next) => {
   readFileAsync('./public/data.json', {encoding: 'utf8'})
@@ -18,34 +19,42 @@ router.get('/', (req, res, next) => {
     mi = mi == undefined || mi == "" ? null : mi;
     ma = ma == undefined || ma == "" || ma == "undefined" ? null : ma;
 
-    console.log(c)
-    console.log(t)
-    console.log(mi)
-    console.log(ma)
-
     if (c == null & t == null && mi == null && ma == null){
       res.send(obj)
     }else {
-      for(var y in obj) {
-        let p = parseFloat(obj[y].Precio.replace(",", "").replace("$", ""))
-        if (obj[y].Ciudad == c && obj[y].Tipo == t && p >= mi && p <= ma) {
-          console.log("todos los filtros")
-          bienes.push(obj[y])
-        } else{
-          if (obj[y].Ciudad == c && t == null && p >= mi && p <= ma) {
-            console.log("filtros ciudad y precios")
-            bienes.push(obj[y])
-          } else {
-            if (obj[y].Tipo == t && c == null && p >= mi && p <= ma) {
-              console.log("filtros tipo y precios")
-              bienes.push(obj[y])
-            } else {//if (p >= mi && p <= ma) {
-              console.log("filtros precios")
-              bienes.push(obj[y])
-            }
-          }
-        }
+      if (c != null && t != null) {
+        bienes = Enumerable.from(obj).Where(function (x) {
+          return x.Ciudad == c && x.Tipo == t &&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) >= mi &&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) <= ma
+        })
+        .Select(function (y) { return y })
+        .ToArray()
+      } else if (c != null && t == null) {
+        bienes = Enumerable.from(obj).Where(function (x) {
+          return x.Ciudad == c //&&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) >= mi &&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) <= ma
+        })
+        .Select(function (y) { return y })
+        .ToArray()
+      } else if (c == null && t != null) {
+        bienes = Enumerable.from(obj).Where(function (x) {
+          return x.Tipo == t &&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) >= mi &&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) <= ma
+        })
+        .Select(function (y) { return y })
+        .ToArray()
+      }  else {
+        bienes = Enumerable.from(obj).Where(function (x) {
+          return parseFloat(x.Precio.replace(",", "").replace("$", "")) >= mi &&
+            parseFloat(x.Precio.replace(",", "").replace("$", "")) <= ma
+        })
+        .Select(function (y) { return y })
+        .ToArray()
       }
+
       res.send(bienes)
     }
   })

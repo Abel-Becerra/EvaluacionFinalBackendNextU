@@ -2,7 +2,8 @@ let express = require('express'),
     router = express.Router(),
     {promisify} = require('util'),
     fs = require('fs'),
-    readFileAsync = promisify(fs.readFile)
+    readFileAsync = promisify(fs.readFile),
+    Enumerable = require("linq-es2015")
 
 router.get('/', (req, res, next) => {
   readFileAsync('./public/data.json', {encoding: 'utf8'})
@@ -11,11 +12,10 @@ router.get('/', (req, res, next) => {
 
     let ciudades = []
 
-    for(var y in obj){
-      if (ciudades.indexOf(obj[y].Ciudad) == -1){
-        ciudades.push(obj[y].Ciudad)
-      }
-    }
+    ciudades = Enumerable.from(obj)
+    .Select(function (y) { return y.Ciudad })
+    .Distinct()
+    .ToArray()
 
     res.send(ciudades)
   })
