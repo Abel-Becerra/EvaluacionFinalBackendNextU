@@ -19,12 +19,17 @@ var searcher = {
       if ($("#checkPersonalizada").is(":checked")){
         params = "?ciudad=" + $("#ciudad").val() + "&tipo=" + $("#tipo").val() + "&minimo=" + $("#rangoPrecio").val().split(';')[0] + "&maximo=" + $("#rangoPrecio").val().split(';')[1]
       }
+      var main = ""
+      $(document).load("template.html",
+        (a,r,t) => {
+          main = a
+      })
       $.getJSON(url + params,
         (data) => {
           $("#bienesraices").html("")
           console.log(data)
           $.map(data, (o, i) => {
-            var tpl = $("#template").html()
+            var tpl = main
             tpl = tpl.replace("{Direccion}", o.Direccion)
             tpl = tpl.replace("{Ciudad}", o.Ciudad)
             tpl = tpl.replace("{Telefono}", o.Telefono)

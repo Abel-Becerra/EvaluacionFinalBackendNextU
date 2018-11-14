@@ -36,6 +36,7 @@ div.lista {
 
 .lista img {
   max-width: 250px !important;
+  padding: 5px;
 }
 
 #personalizada {
